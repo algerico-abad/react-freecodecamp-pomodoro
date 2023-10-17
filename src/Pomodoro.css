@@ -1,0 +1,120 @@
+:root {
+    --color-primary: #C1E949;
+    --color-seconday: #3A4224;
+    --color-black-primary: #0F0F0F;
+    --color-black-seconday: #212121;
+    --color-white-primary: rgba(255, 255, 255, 1);
+    --color-white-seconday: rgba(255, 255, 255, 0.5);
+}
+
+.row,
+.column {
+    display: flex;
+}
+
+.row { flex-direction: row }
+.column { flex-direction: column }
+
+.label {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-white-primary);
+}
+
+.caption {
+    font-size: 12px;
+    color: var(--color-white-seconday);
+}
+
+.btn-text-pri,
+.btn-text-sec {
+    font-size: 16px;
+    font-weight: 700;
+    padding: 11px 16px;
+}
+
+.btn-icon-pri,
+.btn-icon-sec {
+    height: 40px;
+    width: 40px;
+}
+
+.btn-icon-pri>svg,
+.btn-icon-sec>svg {
+    height: 20px;
+    width: 20px;
+}
+
+.btn-text-pri,
+.btn-icon-pri {
+    color: var(--color-black-primary);
+    background-color: var(--color-primary);
+}
+
+.btn-text-sec,
+.btn-icon-sec {
+    color: var(--color-primary);
+    background-color: var(--color-seconday);
+}
+
+.btn-text-pri,
+.btn-text-sec,
+.btn-icon-pri,
+.btn-icon-sec {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 24px;
+    cursor: pointer;
+}
+
+.container {
+    background-color: #212121;
+    max-width: 280px;
+    width: 100%;
+    border-radius: 40px;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 16px;
+    gap: 16px;
+    margin: 0px 16px;
+}
+
+.container>.column,
+.container>.row {
+    flex: 1;
+}
+
+#interface-main {
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 16px;
+}
+
+#interface-clock {
+    padding: 24px;
+}
+
+#interface-clock>.row {
+    gap: 8px;
+}
+
+#interface-clock>.row>div {
+    flex: 1;
+}
+
+#interface-clock #time-left,
+#interface-clock .caption,
+#interface-session .label,
+#interface-session .caption,
+#interface-break .label,
+#interface-break .caption {
+    text-align: center;
+}
+
+#time-left {
+    font-size: 128px;
+    font-family: 'Bebas Neue';
+    color: var(--color-white-primary);
+}
