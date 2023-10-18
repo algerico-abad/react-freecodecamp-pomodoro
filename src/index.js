@@ -5,5 +5,7 @@ import Pomodoro from './Pomodoro';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <Pomodoro />
+  <React.StrictMode>
+    <Pomodoro />
+  </React.StrictMode>
 );

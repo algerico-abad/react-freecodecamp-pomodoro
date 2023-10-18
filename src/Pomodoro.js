@@ -12,13 +12,12 @@ class Pomodoro extends React.Component {
             label_timer: 'Session',
             label_session: 'Session Time (Mins)',
             label_break: 'Break Time (Mins)',
-            time_current_time: '25:00',
-            time_current_seconds: 0,
-            time_current_minutes: 25,
+            time_left: 1500,
             time_session: 25,
             time_break: 5,
             time_count: false,
-            time_phase: 'Session'
+            time_phase: 'Session',
+            time_ID: null
         }
         this.DecrementSession = this.DecrementSession.bind(this)
         this.IncrementSession = this.IncrementSession.bind(this)
@@ -31,12 +30,10 @@ class Pomodoro extends React.Component {
     DecrementSession() {
         if (!this.state.time_count) {
             this.setState((state) => ({
-                time_session: (state.time_session > 1) ? state.time_session - 1 : 1
+                time_session: Math.max(1, state.time_session - 1),
             }))
             this.setState((state) => ({
-                time_current_time: `${(state.time_phase === 'Session') ? state.time_session.toString().padStart(2,0) : state.time_break.toString().padStart(2,0)}:00`,
-                time_current_minutes: (state.time_phase === 'Session') ? state.time_session : state.time_break,
-                time_current_seconds: 0
+                time_left: (state.time_phase === 'Session') ? state.time_session * 60 : state.time_break * 60
             }))
         }
     }
@@ -44,12 +41,10 @@ class Pomodoro extends React.Component {
     IncrementSession() {
         if (!this.state.time_count) {
             this.setState((state) => ({
-                time_session: (state.time_session < 60) ? state.time_session + 1 : 60
+                time_session: Math.min(60, state.time_session + 1),
             }))
             this.setState((state) => ({
-                time_current_time: `${(state.time_phase === 'Session') ? state.time_session.toString().padStart(2,0) : state.time_break.toString().padStart(2,0)}:00`,
-                time_current_minutes: (state.time_phase === 'Session') ? state.time_session : state.time_break,
-                time_current_seconds: 0
+                time_left: (state.time_phase === 'Session') ? state.time_session * 60 : state.time_break * 60
             }))
         }
     }
@@ -57,12 +52,10 @@ class Pomodoro extends React.Component {
     DecrementBreak() {
         if (!this.state.time_count) {
             this.setState((state) => ({
-                time_break: (state.time_break > 1) ? state.time_break - 1 : 1
+                time_break: Math.max(1, state.time_break - 1),
             }))
             this.setState((state) => ({
-                time_current_time: `${(state.time_phase === 'Session') ? state.time_session.toString().padStart(2,0) : state.time_break.toString().padStart(2,0)}:00`,
-                time_current_minutes: (state.time_phase === 'Session') ? state.time_session : state.time_break,
-                time_current_seconds: 0
+                time_left: (state.time_phase === 'Session') ? state.time_session * 60 : state.time_break * 60
             }))
         }
     }
@@ -70,27 +63,26 @@ class Pomodoro extends React.Component {
     IncrementBreak() {
         if (!this.state.time_count) {
             this.setState((state) => ({
-                time_break: (state.time_break < 60) ? state.time_break + 1 : 60
+                time_break: Math.min(60, state.time_break + 1),
             }))
             this.setState((state) => ({
-                time_current_time: `${(state.time_phase === 'Session') ? state.time_session.toString().padStart(2,0) : state.time_break.toString().padStart(2,0)}:00`,
-                time_current_minutes: (state.time_phase === 'Session') ? state.time_session : state.time_break,
-                time_current_seconds: 0
+                time_left: (state.time_phase === 'Session') ? state.time_session * 60 : state.time_break * 60
             }))
         }
     }
 
     ResetClock() {
-        this.setState({
+        if (this.state.time_ID != null) this.state.time_ID.cancel()
+        this.setState((state) => ({
+            label_start: 'Start',
             label_timer: 'Session',
-            time_current_time: '25:00',
-            time_current_seconds: 0,
-            time_current_minutes: 25,
+            time_left: 1500,
             time_session: 25,
             time_break: 5,
             time_count: false,
-            time_phase: 'Session'
-        })
+            time_phase: 'Session',
+            time_ID: null
+        }))
         const AUDIO = document.getElementById('beep')
         AUDIO.pause()
         AUDIO.currentTime = 0
@@ -101,40 +93,44 @@ class Pomodoro extends React.Component {
             time_count: !state.time_count,
         }))
         this.setState((state) => ({
-            label_start: (state.time_count) ? 'Pause' : 'Start'
+            label_start: (state.time_count) ? 'Pause' : 'Start',
+            time_ID: (state.time_ID) ? state.time_ID.cancel() : this.Countdown(1000)
         }))
     }
     
-    componentDidMount() {
-        setInterval(() => {
-            if (this.state.time_count) {
-                this.setState({
-                    time_current_time: `${this.state.time_current_minutes.toString().padStart(2, 0)}:${this.state.time_current_seconds.toString().padStart(2, 0)}`
-                })
-                console.log(this.state.time_current_seconds)
-                if (this.state.time_current_seconds > 0) {
-                    this.setState((state) => ({
-                        time_current_seconds: state.time_current_seconds - 1
-                    }))
-                } else if (this.state.time_current_seconds == 0 && this.state.time_current_minutes > 0) {
-                    this.setState((state) => ({
-                        time_current_minutes: state.time_current_minutes - 1,
-                        time_current_seconds: 59
-                    }))
-                } else if (this.state.time_current_seconds == 0 && this.state.time_current_minutes == 0) {
-                    console.log('completed minutes...')
-                    this.setState((state) => ({
-                        label_timer: (state.label_timer === 'Session') ? 'Break' : 'Session',
-                        time_phase: (state.time_phase === 'Session') ? 'Break' : 'Session',
-                    }))
-                    this.setState((state) => ({
-                        time_current_minutes: (state.time_phase === 'Session') ? state.time_session : state.time_break
-                    }))
-                    const AUDIO = document.getElementById('beep')
-                    AUDIO.play()
-                }
+    Countdown(timeout) {
+        let countdown, cancel, nextStart
+        nextStart = new Date().getTime() + timeout
+        countdown = setInterval(() => {
+            if (this.state.time_left > 0) {
+                this.setState((state) => ({
+                    time_left: state.time_left - 1
+                }))
+            } else {
+                this.setState((state) => ({
+                    label_timer: (state.label_timer === 'Session') ? 'Break' : 'Session',
+                    time_phase: (state.time_phase === 'Session') ? 'Break' : 'Session',
+                }))
+                this.setState((state) => ({
+                    time_left: (state.time_phase === 'Session') ? state.time_session * 60 : state.time_break * 60
+                }))
+                const AUDIO = document.getElementById('beep')
+                AUDIO.play()
             }
-        }, 1000)
+            nextStart = new Date().getTime() + timeout
+        }, nextStart - new Date().getTime())
+        cancel = () => { clearInterval(countdown) }
+        return { cancel: cancel }
+    }
+
+    CountdownDisplay() {
+        if (this.state.time_left === 0) {
+            return '00:00'
+        } else {
+            let MINUTES = Math.floor(this.state.time_left / 60)
+            let SECONDS = this.state.time_left - MINUTES * 60
+            return `${MINUTES.toString().padStart(2,0)}:${SECONDS.toString().padStart(2,0)}`
+        }
     }
 
     render() {
@@ -145,7 +141,7 @@ class Pomodoro extends React.Component {
                 </audio>
                 <div className='column container' id='interface-clock'>
                     <div className='column' id='clock-timer'>
-                        <div id='time-left'>{this.state.time_current_time}</div>
+                        <div id='time-left'>{this.CountdownDisplay()}</div>
                         <div id='timer-label' className='caption'>{this.state.label_timer}</div>
                     </div>
                     <div className='row' id='clock-actions'>
